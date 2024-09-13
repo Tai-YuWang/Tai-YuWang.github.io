@@ -16,4 +16,4 @@
 
 ## Give adive for future students who are interested in learning them.
 
-- I would say that you should research on exactly 
+- I would say that you should research on exactly how to use the code and practice how to use the code and to get in the habit of using the code.
