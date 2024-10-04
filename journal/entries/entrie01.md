@@ -1,5 +1,3 @@
-[back](journal/index.md)
-
 # Journal about command line tools
 
 ## Summarize the importance of each of these tools:

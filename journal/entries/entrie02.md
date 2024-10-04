@@ -1,6 +1,4 @@
-[back](journal/index.md)
-
-#Encryption Activity
+# Encryption Activity
 
 ## What is the difference between symmetric and asymmetric encryption?
 
