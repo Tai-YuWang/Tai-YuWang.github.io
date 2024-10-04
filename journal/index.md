@@ -8,4 +8,4 @@ In this journal, I will write about:
 
 # Here are my journal entries
 
-- [My Journey learning the terminal](terminal.md)
+- [Command Line Tools](terminal.md)
