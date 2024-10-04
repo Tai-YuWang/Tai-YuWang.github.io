@@ -8,5 +8,5 @@ In this journal, I will write about:
 
 # Here are my journal entries
 
-- [Command Line Tools](entrie:0d.md)
-- [Encryption Activity](entrie:02.md)
+- [Command Line Tools](entrie01.md)
+- [Encryption Activity](entrie02.md)
