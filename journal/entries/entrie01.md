@@ -1,4 +1,4 @@
-[go back](index.md)
+[back](journal/index.md)
 
 # Journal about command line tools
 
