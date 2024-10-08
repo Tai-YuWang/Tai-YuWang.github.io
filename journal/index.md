@@ -10,6 +10,5 @@ In this journal, I will write about:
 
 - [Command Line Tools](entries/entrie01.md)
 - [Encryption Activity](entries/entrie02.md)
-- [Markdown: LaTeX, and Images](entries/entrie03.md)
 
 
