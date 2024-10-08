@@ -20,4 +20,4 @@ blah blah blah
 
 [this is the text that is displayed](www.example.com)
 
-![this is the text](http://cameronmcfee.com/img/work/the-octocat/original.jpeg)
+![this is the text](https://cameronmcefee.com/img/work/the-octocat/original.jpg)
