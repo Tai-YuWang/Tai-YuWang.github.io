@@ -20,3 +20,14 @@
 |Linear Pair                 | They are equal to 180             |
 
 ![Image](https://d138zd1ktt9iqe.cloudfront.net/media/seo_landing_files/same-side-interior-angles-1624281094.png)
+
+## Some examples of what certain angle relationships look like are above
+
+- 6 and 4, as well as 5 and 3, are examples of alternate interior angles
+- 7 and 1, as well as 8 and 2, are examples of alternate exterior angles
+- 3 and 6, as well as 4 and 5, are examples of same side interior angles
+- 1 and 8, as well as 2 and 7, are examples of same side exterior angles
+- 2 and 6, 3 and 7, 1 and 5, and finally 4 and 8 are examples of corresponding angles
+- 2 and 4, 1 and 3, 5 and 7, and 8 and 6, are all examples of vertical angles
+- 1 and 2, 4 and 3, 5 and 6, and 8 and 7 are only some of the linear pairs in this digram
+
