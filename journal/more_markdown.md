@@ -21,3 +21,9 @@ blah blah blah
 [this is the text that is displayed](www.example.com)
 
 ![this is the text](https://cameronmcefee.com/img/work/the-octocat/original.jpg)
+
+|Cat Name | Facts        |
+|---------|--------------|
+|Garfield | Likes lasagna|
+|Tom      | Chases Jerry |
+|Meowth   | That's right |
