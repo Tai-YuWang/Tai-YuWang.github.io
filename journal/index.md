@@ -10,5 +10,5 @@ In this journal, I will write about:
 
 - [Command Line Tools](entries/entrie01.md)
 - [Encryption Activity](entries/entrie02.md)
-- [Markdown: Image and table](entries/entries03.html)
+- [Markdown: Image and table](entries/entries03.md)
 
