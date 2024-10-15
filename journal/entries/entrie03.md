@@ -36,8 +36,8 @@
 
 |Shapes               | Area Formula      |
 |---------------------|-------------------|
-|Square/Rectangle     |A = lw P = 2(l + w)                |
-|Triangle             |A = $$\frac{b}{h}$$                |
-|Circle               |A = $$\pi r^{2}$$                  |
-|Hexagon              |A = $$\frac{3\sqrt{3}}{2}a^{2}$$   |
+|Square/Rectangle     |A = lw P = 2($l + w$)                |
+|Triangle             |A = $\frac{b}{h}$                |
+|Circle               |A = $\pi r^{2}$                 |
+|Hexagon              |A = $\frac{3\sqrt{3}}{2}a^{2}$   |
 
