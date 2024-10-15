@@ -21,6 +21,7 @@
 
 ![Image](https://d138zd1ktt9iqe.cloudfront.net/media/seo_landing_files/same-side-interior-angles-1624281094.png)
 
+
 ## Some examples of what certain angle relationships look like are above
 
 - 6 and 4, as well as 5 and 3, are examples of alternate interior angles
@@ -30,4 +31,13 @@
 - 2 and 6, 3 and 7, 1 and 5, and finally 4 and 8 are examples of corresponding angles
 - 2 and 4, 1 and 3, 5 and 7, and 8 and 6, are all examples of vertical angles
 - 1 and 2, 4 and 3, 5 and 6, and 8 and 7 are only some of the linear pairs in this digram
+
+![Image](https://c7.alamy.com/comp/R86D82/basic-geometric-shapes-icon-set-vector-illustration-flat-design-R86D82.jpg)
+
+|Shapes               | Formula      |
+|---------------------|--------------|
+|Square/Rectangle     |A = lw P = 2(l + w)
+|Triangle             |A = $$\frac{b}{h} P = a + b + c$$
+|Circle               |A = $$\pi r^{2} C = 2 \pi r$$
+|Hexagon              |A = $$\frac{3\sqrt{3}}{2}a^{2}$$ P = 6a
 
