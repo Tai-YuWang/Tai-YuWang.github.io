@@ -34,10 +34,10 @@
 
 ![Image](https://c7.alamy.com/comp/R86D82/basic-geometric-shapes-icon-set-vector-illustration-flat-design-R86D82.jpg)
 
-|Shapes               | Formula      |
-|---------------------|--------------|
-|Square/Rectangle     |A = lw P = 2(l + w)
-|Triangle             |A = $\frac{b}{h}$ P = a + b + c
-|Circle               |A = $\pi r^{2}$ C = 2 $\pi$ r
-|Hexagon              |A = $\frac{3\sqrt{3}}{2}a^{2}$ P = 6a
+|Shapes               | Area Formula      |
+|---------------------|-------------------|
+|Square/Rectangle     |A = lw P = 2(l + w)                |
+|Triangle             |A = $$\frac{b}{h}$$                |
+|Circle               |A = $$\pi r^{2}$$                  |
+|Hexagon              |A = $$\frac{3\sqrt{3}}{2}a^{2}$$   |
 
