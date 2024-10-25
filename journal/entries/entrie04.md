@@ -4,9 +4,9 @@
 
 ## Websites I used
 
-[Website #1 Heidelberg Bakery](https://heidelbergbakery.com/)
-[Website #2 Cake Mans Sweets Bakery](https://cake-mans-sweets-bakery-1.ueniweb.com/)
-[Website #3 Village Sweet Bakery](https://www.villagesweetbakery.com/)
+- [Website #1 Heidelberg Bakery](https://heidelbergbakery.com/)
+- [Website #2 Cake Mans Sweets Bakery](https://cake-mans-sweets-bakery-1.ueniweb.com/)
+- [Website #3 Village Sweet Bakery](https://www.villagesweetbakery.com/)
 
 ## How did these websites help me?
 
