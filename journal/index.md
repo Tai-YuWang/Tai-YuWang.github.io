@@ -11,4 +11,4 @@ In this journal, I will write about:
 - [Command Line Tools](entries/entrie01.md)
 - [Encryption Activity](entries/entrie02.md)
 - [Markdown: Image, Table, and LaTeX](entries/entrie03.md)
-- [Markdown Website and Reflection](entries/entrie04.md
+- [Markdown Website and Reflection](entries/entrie04.md)
