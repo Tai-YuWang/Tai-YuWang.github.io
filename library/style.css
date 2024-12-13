@@ -6,14 +6,26 @@ th, td, table {
 	border-collapse:collapse;
 }
 nav {
-	background-color:#a2a8d3; width:115px;
+	background-color:#a2a8d3;
+	width:115px;
 }
 .time {
 	background-color:#a2a8d3;
+	font-family:"Courier New";
 }
 #copyright {
-	color:rgb(249, 89, 89); width:300px
+	color:rgb(249, 89, 89);
+	width:300px;
 }
 .list {
 	background-color:skyblue;
+}
+H1 {
+	text-transform:uppercase;
+}
+p {
+	text-align:center;
+}
+#left {
+	text-align:"left";
 }
