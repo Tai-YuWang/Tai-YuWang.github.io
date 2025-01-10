@@ -1,0 +1,30 @@
+body{
+	background-color:#87CEEB;
+}
+nav{
+	background-color:white;
+	grid-area:2/8/6/9;
+	padding-top:80px;
+
+}
+.grid{
+        display:grid;
+        grid-template-columns:repeat(8,1fr);
+        grid-template-rows:repeat(8,1fr);
+        height:80vh;
+        text-align:center;
+}
+header{
+	grid-area:1/1/2/9;
+	font-size:32px;
+	font-family:"Courier New";
+}
+#about{
+	display:grid;
+        grid-area:2/3/6/5;
+	font-size:18px;
+}
+
+#image{
+	grid-area:2/1/6/3;
+}
