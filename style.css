@@ -4,7 +4,7 @@ body{
 nav{
 	background-color:white;
 	grid-area:2/8/6/9;
-	padding-top:80px;
+	padding-top:30px;
 
 }
 .grid{
