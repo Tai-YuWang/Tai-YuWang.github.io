@@ -1,0 +1,10 @@
+@-moz-document url("simple.org") {
+    /* Insert code here... */
+}
+body {
+    background-color: skyblue;
+    font-family: "Marker Felt";
+}
+.intro {
+    font-size: 15px;
+}
