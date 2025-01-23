@@ -25,24 +25,19 @@
     }
 
     /* Color specific squares */
-    .grid-container div:nth-child(1),
-    .grid-container div:nth-child(5),
-    .grid-container div:nth-child(10),
-    .grid-container div:nth-child(7){
+    .grid-container div:nth-child(13),
+    .grid-container div:nth-child(14),
+	.grid-container div:nth-child(17),
+	.grid-container div:nth-child(18),
+    .grid-container div:nth-child(23),
+	.grid-container div:nth-child(24),
+	.grid-container div:nth-child(27),
+	.grid-container div:nth-child(28),
+	.grid-container div:nth-child(54),
+	.grid-container div:nth-child(57),
+	.grid-container div:nth-child(65),
+	.grid-container div:nth-child(66){
         background-color:black;
-    }
-
-	.grid-container div:nth-child(8){
-	background-color:wheat;
-	}
-    /* Color every even square */
-    .grid-container div:nth-child(even) {
-      background-color: #76b5c5;
-    }
-
-    /* Color every 3rd square */
-    .grid-container div:nth-child(3n) {
-      background-color: #ffcc5c;
     }
 
     /*
@@ -50,12 +45,8 @@
         - `div:nth-child(n+41)`: Selects all `div` elements that are the 41st child or later.
         - `:nth-child(-n+50)`: Selects all `div` elements that are the 50th child or earlier.
     */
-    .grid-container div:nth-child(n+41):nth-child(-n+50) {
-      background-color: #f78da7;
-    }
   </style>
 </head>
-<body>
   <div class="grid-container">
     <!-- 100 divs -->
     <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
