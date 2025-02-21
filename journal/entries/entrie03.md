@@ -34,8 +34,8 @@
 
 ![Image](https://c7.alamy.com/comp/R86D82/basic-geometric-shapes-icon-set-vector-illustration-flat-design-R86D82.jpg)
 
-|Shapes               | Area Formula      |
-|---------------------|-------------------|
+|Shapes               | Area Formula                  |
+|---------------------|-------------------------------|
 |Square/Rectangle     |A = lw                         |
 |Triangle             |A = $\frac{b}{h}$              |
 |Circle               |A = $\pi r^{2}$                |
