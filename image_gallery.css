@@ -1,0 +1,38 @@
+#one{
+	width:100px;
+	height:100px;
+}
+#two{
+	max-width:80%;
+	min-width:50%;
+	max-height:80%;
+	min-height:50%;
+}
+#three{
+	object-fit:cover;
+}
+#four{
+	object-position:right;
+}
+#five{
+	border: 10px solid;
+}
+#six{
+	box-shadow:10px 10px 5px 6px rgba(0, 0, 0, 0.75);
+}
+#seven{
+	opacity: .5;
+}
+#eight{
+	filter:blur(5px);
+}
+#nine{
+	filter:invert(.8);
+}
+
+
+
+
+
+
+
