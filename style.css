@@ -36,3 +36,7 @@ header{
 	grid-area:3/2/8/7;
 	font-size:24px;
 }
+#img_map{
+	grid-area:7/1/9/2;
+	margin-top:-140px;
+}
