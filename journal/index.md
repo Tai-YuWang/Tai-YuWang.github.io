@@ -12,4 +12,5 @@ In this journal, I will write about:
 - [Encryption Activity](entries/entrie02.md)
 - [Markdown: Image, Table, and LaTeX](entries/entrie03.md)
 - [Markdown Website and Reflection](entries/entrie04.md)
-- [Stylus Projetc](entries/entrie05.md)
+- [Stylus Project](entries/entrie05.md)
+- [Off the Pike Project](entries/entrie06.md)
