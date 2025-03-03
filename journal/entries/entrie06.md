@@ -5,6 +5,7 @@
 [Repo Link](https://github.com/Tai-YuWang/Best_Table.github.io)
 
 ![Image](../../image/menu_page.png)
+![Image](../../image/takeout_page.png)
 
 The request method I used was post. The input types I used were mostly the drop down menus because for the main courses, and the sides, there was a lot of options for each. So I didn't want all of the options to cover the entire screen and seem overwhelming.
 
