@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Self Portrait</title>
+	<script src="js/init.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="400" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+//Background
+    ctx.fillStyle = 'green';
+    ctx.fillRect(0,0,400,400);
+//Head
+	ctx.fillStyle = "lemonchiffon"
+    ctx.beginPath();
+    ctx.arc(200,200,100,0,2 * Math.PI);
+    ctx.fill();
+//Right Eye
+	ctx.fillStyle = "black"
+    ctx.beginPath();
+    ctx.arc(150,200,10,0,2 * Math.PI);
+    ctx.fill();
+//Left Eye
+	ctx.fillStyle = "black"
+    ctx.beginPath();
+    ctx.arc(250,200,10,0,2 * Math.PI);
+    ctx.fill();
+//Body
+	ctx.fillStyle = "black";
+    ctx.fillRect(10, 300, 380, 100);
+//hair
+    ctx.fillStyle = "black";
+    ctx.fillRect(100, 100, 200, 50);
+//mouth
+    ctx.fillStyle = "black"
+    ctx.beginPath();
+    ctx.arc(200,250,25,0,2 * Math.PI);
+    ctx.fill();
+  </script>
+</body>
+</html>
