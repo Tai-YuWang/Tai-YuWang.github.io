@@ -1,0 +1,93 @@
+body{
+    background-color: #305dcf;
+}
+.emoji{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    width: 300px;
+    background-image: radial-gradient(
+        #feca3e 58%,
+        #ff8000 80%
+    );
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 30px 30px 35px rgba(0,0,0,0.25);
+}
+
+/* Build the eyes */
+.eyes {
+    display: flex;
+}
+
+.eye {
+  width: 50px;
+  height: 50px;
+  background: red;
+  border-radius: 50%;
+    background-color: #663d0f;
+    position: absolute;
+}
+
+.left {
+    top: 90px;
+    left: 25%;
+    animation-name: move;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
+}
+
+.right {
+    top: 90px;
+    right: 25%;
+	animation-name: right;
+	animation-duration:5s;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-timing-function:ease-in-out;
+}
+
+.mouth{
+    height: 100px;
+    width: 220px;
+    background-color: #663d0f;
+    position: absolute;
+    margin: auto;
+    left: 0;
+    right: 0;
+    bottom: 25px;
+    overflow: hidden;
+    border-radius: 5px 5px 180px 180px;
+	animation-name:top;
+    animation-duration:2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function:ease-in-out;
+	    background-color: wheat;
+    animation-name: rotate;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes move{
+	from{left:2%;}
+	to{left:20%;}
+}
+@keyframes right {
+    from{right:2%;}
+    to{right:20%;}
+}
+@keyframes top {
+	from{top:40%;}
+	to{top:60%;}
+}
+
+@keyframes rotate {
+	50% {transform: rotate(360deg);}
+}
