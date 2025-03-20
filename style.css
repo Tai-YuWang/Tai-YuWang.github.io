@@ -2,42 +2,43 @@ body{
 	background-color:#87CEEB;
 }
 nav{
-	grid-area:2/7/6/9;
+	grid-area:nav;
 	padding-top:10px;
 	font-size:20px;
 
 }
 .grid{
-        display:grid;
-        grid-template-columns:repeat(8,1fr);
-        grid-template-rows:repeat(8,1fr);
-        height:80vh;
-        text-align:center;
+	display: grid;
+	grid:
+		"header header" 1fr
+		"image about" 2fr
+		"nav img_map" 2fr;
+	/1fr
 }
 header{
-	grid-area:1/1/2/9;
+	grid-area:header;
 	font-size:32px;
 	font-family:"Courier New";
 }
 #about{
 	display:grid;
-        grid-area:2/3/6/5;
+    grid-area:about;
 	font-size:18px;
 }
 
 #image{
-	grid-area:2/1/6/3;
+	grid-area:image;
 }
 .navhead{
 	font-family:"Courier New";
 	font-size:50px;
 }
 #projects{
-	grid-area:3/2/8/7;
+	grid-area:projects;
 	font-size:24px;
 }
 #img_map{
-	grid-area:7/1/9/2;
+	grid-area:img_map;
 	margin-top:-140px;
 }
 
