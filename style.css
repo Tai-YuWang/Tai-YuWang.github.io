@@ -15,6 +15,13 @@ nav{
 		"nav img_map" 2fr;
 	/1fr
 }
+.pgrid{
+    display: grid;
+    grid:
+        "header" 1fr
+        "projects" 2fr;
+}
+
 header{
 	grid-area:header;
 	font-size:32px;
