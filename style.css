@@ -40,6 +40,8 @@ header{
 	grid-area:7/1/9/2;
 	margin-top:-140px;
 }
+
 .color-change:hover{
-	color:white;
+	color: white;
+	transition: color 0.5s ease-in-out;
 }
