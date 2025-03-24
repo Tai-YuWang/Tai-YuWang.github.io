@@ -59,4 +59,4 @@ We'll use this to inform our study plan for the test.
 
 ## Study Plan
 
-(We'll start filling this part in next class)
+I will look at previous/smilar tests compared to this one. I will also look at our privous units and tests to check to see what my weaknesses are. Using this information I will study based on that and take mock tests with and without notes to get confortable with it.
