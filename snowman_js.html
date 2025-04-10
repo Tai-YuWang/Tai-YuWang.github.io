@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Snowman js practice</title>
+	<style>
+		canvas{
+			border:1px solid;
+		}
+	</style>
+</head>
+<body>
+	<h1>Snowman js practice with canvas</h1>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+<script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+
+	ctx.fillStyle = "blue";
+	ctx.fillRect(0,0,400,400);
+
+function circle(x, y, r){
+    ctx.fillStyle = "white"
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,2 * Math.PI);
+    ctx.fill();
+}
+
+
+function snowman(x,y,r){
+	circle(x,y,r);
+	circle(x,y+70,r+30);
+	circle(x,y+130,r+45);
+}
+
+snowman(100,100,25);
+
+
+</script>
+</body>
+</html>
