@@ -6,7 +6,9 @@
     <style>
         canvas{
             border:1px solid;
+			display:flex;
 			align-items: center;
+			justify-content: center;
         }
     </style>
 </head>
@@ -17,41 +19,124 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-let x = 
-0;
-let dx = 4;
+let x = 0;
+let dx = 5;
 let y = 0;
-let dy= 5.3;
+let dy =1; 
+let score=0;
+let gameRunning = true;
+
+const player = {
+    //key:value pair
+    x : 0,
+    y : 0,
+    color: 'green',
+    speed: 3
+};
+
+const keys = {};
 
 //define functions
 function drawRect(x,y) {
-    console.log("drawing rect");
+    //console.log("drawing rect");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'blue';
     ctx.fillRect(x,y,50,50);
+}
+
+function drawPlayer(){
+    ctx.fillStyle = player.color;
+    ctx.beginPath();
+    ctx.arc(
+        player.x, //accessing the variable called x inside the player object
+        player.y,
+        20,
+        0,
+        2*Math.PI
+    );
     ctx.fill();
 }
 
+function movePlayer(){
+    if(keys['ArrowDown'] && (player.y < 400)) {
+        player.y += player.speed;
+    }
+    if(keys['ArrowUp'] && (player.y > 0)) { 
+        player.y -= player.speed;
+    }
+    if(keys['ArrowLeft'] && (player.x > 0)) {
+        player.x -= player.speed;
+    }
+    if(keys['ArrowRight'] && (player.x < 400)) {
+        player.x += player.speed;
+    }
+}
+
+function drawScore(){
+	ctx.font = "10px Arial";
+	ctx.fillText(score, 10, 10);
+}
 function animate() {
-    x = x+dx
-	y = y+dy
-	drawRect(x, y);
-
-    // TODO: Add some code here 
-    //  that will change the rectangle's position
 	
-	if(x > 350 ||  x < 0){
-		dx = dx * -1
+if (gameRunning){
+	score++;
+	if (score >= 200){
+		gameRunning = false
 }
-    if(y > 350 ||  y < 0){
-        dy = dy * -1
-}
+    drawRect(x,y);
+	drawScore();
+    movePlayer();
+    drawPlayer();
+	
+    // This code handles the position of the bouncing box.
+    //We probably should have separated it out into a function
+    //called moveBox()
+    x = x + dx;
+    y = y + dy;
 
+    if(x > 350){
+        dx = dx * -1;
+    }
+    if(x < 0){
+        dx = dx * -1;
+    }
 
+    if(y > 350){
+        dy = dy * -1;
+    }
+    if(y < 0){
+        dy = dy * -1;
+    }
+
+    //this schedules the next call of this function for 1/60
+    //of a second from now
     requestAnimationFrame(animate);
+
+
+//This is the "event listner" that we'll attach to the DOM
+//it automatically receives an input, e, which is the event
+//and includes properties like which key was pressed 
+function handleKeyPress(e){
+    //as an early test to see which key was pressed, we wrote this:
+    //console.log(e.key); 
+    keys[e.key] = true;
 }
 
-//call our function
+
+document.addEventListener('keydown', handleKeyPress);
+
+//This is a shorthand way to define and use a function
+// at the same time. We call this
+//an "arrow function"
+document.addEventListener('keyup', (e) => {
+    keys[e.key] = false;
+});
+
+//call our animate function the first time
+//after this first run, requestAnimationFrame() will
+//take over
+}
+}
 animate();
 </script>
 
