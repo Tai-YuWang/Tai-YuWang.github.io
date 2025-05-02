@@ -20,6 +20,11 @@ const player = {
 	speed: 3,
 };
 
+//generating a random number
+function getRandomNumber() {
+    return Math.floor(Math.random() * 10) + 1;
+}
+
 //key presses
 const keys = {};
 
@@ -47,24 +52,18 @@ function moveBall(){
 	ball.x = ball.x + ball.dx;
     ball.y = ball.y + ball.dy;
 
-    if(ball.x > 600){
-        gameRunning = false;
-    }
-    if(ball.x < 0){
+    if(ball.x > 600 || ball.x < 0){
         gameRunning = false;
     }
 
-    if(ball.y > 400){
-        ball.dy = ball.dy * -1;
-    }
-    if(ball.y < 0){
+    if(ball.y > 400 || ball.y < 0){
         ball.dy = ball.dy * -1;
     }
 }
 
 //moving player
 function movePlayer(){
-    if(keys['ArrowDown'] && (player.y < 400)) {
+    if(keys['ArrowDown'] && (player.y < 350)) {
         player.y += player.speed;
     }
     if(keys['ArrowUp'] && (player.y > 0)) { 
