@@ -59,6 +59,7 @@ function moveBall(){
     if(ball.y > 400 || ball.y < 0){
         ball.dy = ball.dy * -1;
     }
+	
 }
 
 //moving player

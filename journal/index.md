@@ -15,3 +15,4 @@ In this journal, I will write about:
 - [Stylus Project](entries/entrie05.md)
 - [Off the Pike Project](entries/entrie06.md)
 - [WDE Exame Prep](entries/exam_prep.md)
+- [Game Concept](entries/entrie07.md)
