@@ -1,6 +1,11 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+//generating a random number
+function getRandomNumber() {
+    return Math.floor(Math.random() * 400) + 1;
+}
+
 let gameRunning = true;
 let frameCount = 0;
 const balls = [];
@@ -24,19 +29,14 @@ const player = {
 
 function generateball () {
     const ball = {
-    x: 300,
-    y: 200,
+    x: 0,
+    y: 1 * getRandomNumber(),
     color: "blue",
     dx: 1,
     dy: 1,
 };
    
     balls.push(ball)
-}
-
-//generating a random number
-function getRandomNumber() {
-    return Math.floor(Math.random() * 10) + 1;
 }
 
 //key presses
@@ -74,7 +74,7 @@ function movePlayer(){
     }
 }
 
-function checkCollision(){
+function checkCollision(ball){
 let ball_min_x = ball.x - 10
 let ball_max_x = ball.x + 10
 let ball_min_y = ball.y - 10
@@ -98,22 +98,30 @@ if (ball_max_y > player_min_y &&
 function update() {
 	frameCount++;
 	if (frameCount % 60 === 0) { generateball(); } 
+
+	//moveballs
 		balls.forEach(ball => {
-			ball.x += ball.dx; ball.y += ball.dy; });
-		balls.forEach(ball => {
-			if (ball.x - 10 > 600){
+			ball.x += ball.dx;
+			ball.y += ball.dy; 
+			checkCollision(ball);
+});
+		balls.forEach((ball, index) => {
+			if (ball.x  > 600){
 		balls.splice(index, 1);
-	if (ball.y)
+}
+	if (ball.y < 10 || ball.y > 390){
+		ball.dy = ball.dy * -1;
 }
 });
 }
 
 //animation function
 function animate() {
+
+if (gameRunning){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	movePlayer();
 	drawPlayerRect();
-	checkCollision();
 	drawBall();
 	update();
 
@@ -129,5 +137,8 @@ document.addEventListener('keyup', (e) => {
     keys[e.key] = false;
 });    
 
+} else {
+	alert("you lose");
+}
 }
 animate();
