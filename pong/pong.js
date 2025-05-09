@@ -5,14 +5,14 @@ let gameRunning = true;
 let frameCount = 0;
 const balls = [];
 
-//ball vari
 const ball = {
-	x: 300,
-	y: 200,
-	color: "blue",
-	dx: 2,
-	dy: 2,
+    x: 0,
+    y: 200,
+    color: "blue",
+    dx: 1,
+    dy: 1,
 };
+   
 
 //players vari
 const player = {
@@ -21,6 +21,18 @@ const player = {
 	color: "black",
 	speed: 3,
 };
+
+function generateball () {
+    const ball = {
+    x: 300,
+    y: 200,
+    color: "blue",
+    dx: 1,
+    dy: 1,
+};
+   
+    balls.push(ball)
+}
 
 //generating a random number
 function getRandomNumber() {
@@ -37,6 +49,7 @@ function drawPlayerRect(){
 
 //creating pong ball
 function drawBall(){
+	balls.forEach(ball => {
     ctx.fillStyle = ball.color;
     ctx.beginPath();
     ctx.arc(
@@ -47,6 +60,7 @@ function drawBall(){
         2*Math.PI
     );
     ctx.fill();
+});
 	balls.push(ball);
 }
 
@@ -81,23 +95,18 @@ if (ball_max_y > player_min_y &&
 
 }
 
-function generateball () {
-	drawBall();
-	balls.push(ball);
-
-}
-
 function update() {
-    frameCount++;
-    if (frameCount % 60 === 0){
-    generateball();
+	frameCount++;
+	if (frameCount % 60 === 0) { generateball(); } 
+		balls.forEach(ball => {
+			ball.x += ball.dx; ball.y += ball.dy; });
+		balls.forEach(ball => {
+			if (ball.x - 10 > 600){
+		balls.splice(index, 1);
+	if (ball.y)
 }
-	balls.forEach(ball => {
-		ball.x += ball.dx;
-		ball.y += ball.dy
-})
+});
 }
-
 
 //animation function
 function animate() {
@@ -105,6 +114,7 @@ function animate() {
 	movePlayer();
 	drawPlayerRect();
 	checkCollision();
+	drawBall();
 	update();
 
 requestAnimationFrame(animate);
