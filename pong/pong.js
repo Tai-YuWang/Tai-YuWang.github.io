@@ -1,21 +1,25 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+let gameRunning = true;
+let frameCount = 0;
+const balls = [];
+let score = 0;
+
 //generating a random number angle
-function getRandomAngle() {
-    return Math.ceil(Math.random() * 4);
+function getRandomAngleX() {
+    return Math.ceil(Math.random() * 1) + 10;
+}
+
+//generating a random number position
+function getRandomAngleY() {
+    return Math.floor(Math.random() * 2);
 }
 
 //generating a random number position
 function getRandomNumber() {
     return Math.floor(Math.random() * 390) + 5;
 }
-
-let gameRunning = true;
-let frameCount = 0;
-const balls = [];
-let score = 0;
-
 
 const ball = {
     x: 10,
@@ -39,8 +43,8 @@ function generateball () {
     x: 0,
     y: 1 * getRandomNumber(),
     color: "blue",
-    dx: 1 * getRandomAngle(),
-    dy: 1 * getRandomAngle(),
+    dx: 1 * getRandomAngleX(),
+    dy: 1 * getRandomAngleY(),
 };
    
     balls.push(ball)
@@ -124,6 +128,7 @@ function update() {
 
 function drawScore(){
     ctx.font = "10px Arial";
+	ctx.fillStyle = "red"
     ctx.fillText(score, 10, 10);
 }
 
