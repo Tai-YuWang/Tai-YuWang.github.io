@@ -10,10 +10,14 @@ The objective is to dodge the balls that are going towards your character. The s
 
 - How will the player interact with the game?
 
-use the up and down arrow keys to move the player up and down
+use the up and down arrow keys to move the player up and down. Once the player youches the ball, GAME OVER.
 
 - What features will you include in your MVP?
 
 the moving player, the ball
 
+[MVP](../../pong/mvp_pong.html)
+
 - Make some concept art
+
+[Art](../../pong/Art.PNG)
