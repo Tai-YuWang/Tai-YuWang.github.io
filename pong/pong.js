@@ -12,22 +12,32 @@ if (score > 5400){
 	console.log("MAX_X");
     return Math.ceil(Math.random() * 3) + 16;
 } else if (score > 4500){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 13;
 } else if (score > 3600){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 11;
 } else if (score > 2700){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 9;
 } else if (score > 1800){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 7;
 } else if (score > 900){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 6;
 } else if (score > 0){
-    return Math.ceil(Math.random() * 3);
+    return Math.ceil(Math.random() * 3) + 3;
 }
 }
 
 //generating a random number position
 function getRandomAngleY() {
+if (score > 5400){
+    console.log("MAX_X");
+    return Math.ceil(Math.random() * 33) - 16;
+} else if (score > 3600){
+    return Math.ceil(Math.random() * 21) - 10;
+} else if (score > 1800){
+    return Math.ceil(Math.random() * 11) - 5;
+} else if (score > 0){
+    return Math.ceil(Math.random() * 7) - 3;
+}
 }
 
 //generating a random number position
