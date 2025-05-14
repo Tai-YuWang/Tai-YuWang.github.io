@@ -8,12 +8,26 @@ let score = 0;
 
 //generating a random number angle
 function getRandomAngleX() {
-    return Math.ceil(Math.random() * 1) + 10;
+if (score > 5400){
+	console.log("MAX_X");
+    return Math.ceil(Math.random() * 3) + 16;
+} else if (score > 4500){
+    return Math.ceil(Math.random() * 3);
+} else if (score > 3600){
+    return Math.ceil(Math.random() * 3);
+} else if (score > 2700){
+    return Math.ceil(Math.random() * 3);
+} else if (score > 1800){
+    return Math.ceil(Math.random() * 3);
+} else if (score > 900){
+    return Math.ceil(Math.random() * 3);
+} else if (score > 0){
+    return Math.ceil(Math.random() * 3);
+}
 }
 
 //generating a random number position
 function getRandomAngleY() {
-    return Math.floor(Math.random() * 2);
 }
 
 //generating a random number position
