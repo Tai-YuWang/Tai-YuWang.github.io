@@ -156,6 +156,17 @@ function drawScore(){
     ctx.fillText(score, 10, 10);
 }
 
+function resetGame() {
+	player.x = 590;
+	player.y = 200
+	score = 0;
+	gameRunning = true;
+	balls.length = 0
+	balls.push({ x: 0, y: 200})
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+document.getElementById("resetButton").addEventListener("click", resetGame)
 //animation function
 function animate() {
 
@@ -167,7 +178,9 @@ if (gameRunning){
 	drawBall();
 	update();
 	drawScore();
-
+        if(keys['R'] || keys['r']) {
+        resetGame();
+    }
 requestAnimationFrame(animate);
 
 function handleKeyPress(e){
@@ -181,7 +194,11 @@ document.addEventListener('keyup', (e) => {
 });    
 
 } else {
-	alert("you lose");
+	requestAnimationFrame(animate);
+        if(keys['R'] || keys['r']) {
+        resetGame();
+    }
 }
 }
+
 animate();

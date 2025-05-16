@@ -5,16 +5,28 @@
 	<script src="../js/init.js"></script>
     <style>
         canvas{
-            border:1px solid;
-            display:flex;
+            border: 1px solid;
+            display: block;
+			justify-content: center;
             align-items: center;
-            justify-content: center;
-        }
+			height: 50vh;
+			margin: auto;
+}
+		h1{
+			text-align: center;
+}
+		#resetButton{
+			display:block;
+			justify-content: center;
+			align-items: center;
+			margin: auto;
+}
     </style>
 </head>
 <body>
 	<h1>Pong</h1>
     <canvas id="myCanvas" width="600" height="400"></canvas>
+	<button id="resetButton">Reset Game</button>
 	<script src="pong.js"></script>
 </body>
 </html>
