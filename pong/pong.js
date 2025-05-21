@@ -1,6 +1,7 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+//vari
 let gameRunning = true;
 let frameCount = 0;
 const balls = [];
@@ -62,6 +63,7 @@ const player = {
 	speed: 3,
 };
 
+//generate balls
 function generateball () {
     const ball = {
     x: 0,
@@ -77,6 +79,7 @@ function generateball () {
 //key presses
 const keys = {};
 
+//draws player
 function drawPlayerRect(){
 	ctx.fillStyle = player.color;
 	ctx.fillRect(player.x, player.y, 10, 50);
@@ -109,6 +112,7 @@ function movePlayer(){
     }
 }
 
+//first creates the hitbox, then checks to see if they overlap
 function checkCollision(ball){
 let ball_min_x = ball.x - 10
 let ball_max_x = ball.x + 10
@@ -130,6 +134,8 @@ if (ball_max_y > player_min_y &&
 
 }
 
+//framerate is counted, and every 60 frames, a ball is generated.
+//if the ball goes out of the frame, it is deleted
 function update() {
 	frameCount++;
 	if (frameCount % 60 === 0) { generateball(); } 
@@ -150,15 +156,44 @@ function update() {
 });
 }
 
+//makes the score visible
 function drawScore(){
     ctx.font = "10px Arial";
-	ctx.fillStyle = "red"
+	ctx.fillStyle = "red";
     ctx.fillText(score, 10, 10);
 }
 
+function drawArrow(){
+//top arrow
+ctx.beginPath();
+
+ctx.moveTo(290,8);
+
+ctx.lineTo(310,8);
+ctx.lineTo(300,18);
+ctx.lineTo(290,8);
+
+ctx.lineTo(290,8);
+
+ctx.stroke();
+//bottom arrow
+ctx.moveTo(290,392);
+
+ctx.lineTo(310,392);
+ctx.lineTo(300,382);
+ctx.lineTo(290, 392);
+
+ctx.lineTo(290, 392);
+
+ctx.stroke();
+}
+
+//when called upon, this resets the vari, and starts the game anew.
 function resetGame() {
+	life = 3
+	frameCount = 0;
 	player.x = 590;
-	player.y = 200
+	player.y = 200;
 	score = 0;
 	gameRunning = true;
 	balls.length = 0
@@ -166,8 +201,11 @@ function resetGame() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+//when the reset game button is clicked, it runs the resetgame function
 document.getElementById("resetButton").addEventListener("click", resetGame)
 //animation function
+
+//this is where all the magic happens
 function animate() {
 
 if (gameRunning){
@@ -178,6 +216,7 @@ if (gameRunning){
 	drawBall();
 	update();
 	drawScore();
+	drawArrow();
         if(keys['R'] || keys['r']) {
         resetGame();
     }
