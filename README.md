@@ -1,18 +1,7 @@
 # Introduction
 
-Hello my is Tai-Yu.
+Hello, my name is Tai-Yu Wang and this is my website
 
-## Thingys to do with markdown
+[https://tai-yuwang.github.io/](https://tai-yuwang.github.io/)
 
-I am currently learning about markdown
-
-* Headers
-* Smaller headers
-* Paragraphs
-* Lists
-
-### its pretty weird
-<<<<<<< HEAD
-=======
-# Tai-YuWang
->>>>>>> daa8dc3 (first commit)
+I currently go to Arlington Tech, in Arlington, Virginia. I am a ceritfied WDE – Certified Entry-Level Web Developer.
