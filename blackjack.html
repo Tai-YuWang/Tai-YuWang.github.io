@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Blackjack Canvas Game</title>
+  <style>
+    body { background: #222; color: #fff; text-align: center; }
+    canvas { background: #006400; margin-top: 20px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Blackjack</h1>
+  <canvas id="gameCanvas" width="600" height="400"></canvas><br>
+  <button onclick="hit()">Hit</button>
+  <button onclick="stand()">Stand</button>
+  <button onclick="restart()">Restart</button>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = [
+      'A', '2', '3', '4', '5', '6', '7',
+      '8', '9', '10', 'J', 'Q', 'K'
+    ];
+
+    let deck, playerHand, dealerHand, gameOver, message, hideDealerCard;
+
+    function createDeck() {
+      let d = [];
+      for (let s of suits) {
+        for (let v of values) {
+          d.push({suit: s, value: v});
+        }
+      }
+      for (let i = d.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [d[i], d[j]] = [d[j], d[i]];
+      }
+      return d;
+    }
+
+    function handValue(hand) {
+      let val = 0, aces = 0;
+      for (let card of hand) {
+        if (card.value === 'A') {
+          val += 11; aces++;
+        } else if (['K','Q','J'].includes(card.value)) {
+          val += 10;
+        } else {
+          val += parseInt(card.value);
+        }
+      }
+      while (val > 21 && aces > 0) {
+        val -= 10; aces--;
+      }
+      return val;
+    }
+
+    function deal() {
+      deck = createDeck();
+      playerHand = [deck.pop(), deck.pop()];
+      dealerHand = [deck.pop(), deck.pop()];
+      gameOver = false;
+      message = '';
+      hideDealerCard = true;
+      draw();
+    }
+
+    function hit() {
+      if (gameOver) return;
+      playerHand.push(deck.pop());
+      if (handValue(playerHand) > 21) {
+        message = 'You bust! Dealer wins.';
+        gameOver = true;
+        hideDealerCard = false;
+      }
+      draw();
+    }
+
+    function stand() {
+      if (gameOver) return;
+      hideDealerCard = false;
+      while (handValue(dealerHand) < 17) {
+        dealerHand.push(deck.pop());
+      }
+      let playerVal = handValue(playerHand);
+      let dealerVal = handValue(dealerHand);
+      if (dealerVal > 21 || playerVal > dealerVal) {
+        message = 'You win!';
+      } else if (dealerVal === playerVal) {
+        message = 'Push!';
+      } else {
+        message = 'Dealer wins!';
+      }
+      gameOver = true;
+      draw();
+    }
+
+    function restart() {
+      deal();
+    }
+
+    function drawCard(card, x, y, faceDown = false) {
+      ctx.save();
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.fillStyle = faceDown ? '#444' : '#fff';
+      ctx.fillRect(x, y, 50, 70);
+      ctx.strokeRect(x, y, 50, 70);
+      if (!faceDown) {
+        ctx.fillStyle = (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black';
+        ctx.font = '20px Arial';
+        ctx.fillText(card.value, x + 5, y + 25);
+        ctx.fillText(card.suit, x + 30, y + 60);
+      } else {
+        ctx.fillStyle = '#333';
+        ctx.font = '30px Arial';
+        ctx.fillText('?', x + 18, y + 48);
+      }
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '20px Arial';
+      ctx.fillStyle = '#fff';
+      ctx.fillText('Dealer', 50, 30);
+      for (let i = 0; i < dealerHand.length; i++) {
+        drawCard(dealerHand[i], 50 + i*60, 40, hideDealerCard && i === 1);
+      }
+      ctx.fillText('Player', 50, 160);
+      for (let i = 0; i < playerHand.length; i++) {
+        drawCard(playerHand[i], 50 + i*60, 170);
+      }
+      ctx.fillStyle = '#fff';
+      ctx.font = '18px Arial';
+      ctx.fillText(`Your hand: ${handValue(playerHand)}`, 50, 260);
+      if (!hideDealerCard) {
+        ctx.fillText(`Dealer hand: ${handValue(dealerHand)}`, 50, 100);
+      }
+      if (message) {
+        ctx.font = '24px Arial';
+        ctx.fillStyle = 'yellow';
+        ctx.fillText(message, 300, 350);
+      }
+    }
+
+    deal();
+  </script>
+</body>
+</html>
