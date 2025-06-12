@@ -16,4 +16,4 @@ In this journal, I will write about:
 - [Off the Pike Project](entries/entrie06.md)
 - [WDE Exame Prep](entries/exam_prep.md)
 - [Game Concept](entries/entrie07.md)
-- [Final Game Project](entries/entri08.md)
+- [Final Game Project](entries/entrie08.md)
