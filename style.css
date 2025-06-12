@@ -43,11 +43,6 @@ header{
 	font-size:24px;
 }
 
-.color-change:hover{
-	color: white;
-	transition: color 0.5s ease-in-out;
-}
-
 #cert{
 	grid-area:cert;
 	font-size:18px;

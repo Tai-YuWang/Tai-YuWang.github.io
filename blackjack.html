@@ -1,153 +1,573 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Blackjack Canvas Game</title>
-  <style>
-    body { background: #222; color: #fff; text-align: center; }
-    canvas { background: #006400; margin-top: 20px; }
-    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        canvas { background: #006400; margin-top: 20px; border-radius: 10px; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+        .chips { margin: 15px 0; }
+        .chip {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            line-height: 50px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 18px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 1px 2px 4px #222;
+            user-select: none;
+        }
+        .chip-5 { background: #b5651d; }
+        .chip-10 { background: #1976d2; }
+        .chip-25 { background: #388e3c; }
+        .chip-50 { background: #d32f2f; }
+        .chip-100 { background: #fbc02d; color: #222; }
+        .chip-250 { background: #7b1fa2; }
+        #bet-info { font-size: 18px; color: #fff; margin-bottom: 10px; }
+        #balance { font-size: 20px; color: #ffeb3b; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
-  <h1>Blackjack</h1>
-  <canvas id="gameCanvas" width="600" height="400"></canvas><br>
-  <button onclick="hit()">Hit</button>
-  <button onclick="stand()">Stand</button>
-  <button onclick="restart()">Restart</button>
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    <h1>Blackjack</h1>
+    <div id="balance"></div>
+    <canvas id="gameCanvas" width="700" height="500"></canvas>
+    <div id="bet-info"></div>
+    <div class="chips">
+        <span style="font-size:16px; color:#000; margin-right:10px;">
+            Amount betting: $<span id="next-bet-amount">0</span>
+        </span>
+        <div class="chip chip-5" onclick="addBet(5)">$5</div>
+        <div class="chip chip-10" onclick="addBet(10)">$10</div>
+        <div class="chip chip-25" onclick="addBet(25)">$25</div>
+        <div class="chip chip-50" onclick="addBet(50)">$50</div>
+        <div class="chip chip-100" onclick="addBet(100)">$100</div>
+        <div class="chip chip-250" onclick="addBet(250)">$250</div>
+        <button onclick="clearBet()" style="vertical-align: top; margin-left: 20px;">Clear Bet</button>
+        <button onclick="placeBet()" style="vertical-align: top;">Place Bet</button>
+    </div>
+    <br>
+    <button onclick="hit()" id="hitBtn" disabled>Hit</button>
+    <button onclick="stand()" id="standBtn" disabled>Stand</button>
+    <button onclick="split()" id="splitBtn" disabled>Split</button>
+    <button onclick="doubleDown()" id="doubleBtn" disabled>Double Down</button>
+    <script>
+        // Blackjack with betting and chips
 
-    const suits = ['♠', '♥', '♦', '♣'];
-    const values = [
-      'A', '2', '3', '4', '5', '6', '7',
-      '8', '9', '10', 'J', 'Q', 'K'
-    ];
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-    let deck, playerHand, dealerHand, gameOver, message, hideDealerCard;
+        const suits = ['♠', '♥', '♦', '♣'];
+        const values = [
+            {name: 'A', value: 11},
+            {name: '2', value: 2},
+            {name: '3', value: 3},
+            {name: '4', value: 4},
+            {name: '5', value: 5},
+            {name: '6', value: 6},
+            {name: '7', value: 7},
+            {name: '8', value: 8},
+            {name: '9', value: 9},
+            {name: '10', value: 10},
+            {name: 'J', value: 10},
+            {name: 'Q', value: 10},
+            {name: 'K', value: 10}
+        ];
 
-    function createDeck() {
-      let d = [];
-      for (let s of suits) {
-        for (let v of values) {
-          d.push({suit: s, value: v});
+        let deck, playerHand, dealerHand, gameOver, message, revealDealer;
+        let balance = 1000;
+        let currentBet = 0;
+        let betPlaced = false;
+        let splitActive = false;
+        let playerHands = [];
+        let currentHandIndex = 0;
+        let reshufflePending = false;
+
+        function updateBalance() {
+            document.getElementById('balance').textContent = `Balance: $${balance}`;
         }
-      }
-      for (let i = d.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [d[i], d[j]] = [d[j], d[i]];
-      }
-      return d;
-    }
 
-    function handValue(hand) {
-      let val = 0, aces = 0;
-      for (let card of hand) {
-        if (card.value === 'A') {
-          val += 11; aces++;
-        } else if (['K','Q','J'].includes(card.value)) {
-          val += 10;
-        } else {
-          val += parseInt(card.value);
+        function updateBetInfo() {
+            document.getElementById('bet-info').textContent = `Current Bet: $${currentBet}`;
+            const nextBet = document.getElementById('next-bet-amount');
+            if (nextBet) nextBet.textContent = currentBet;
         }
-      }
-      while (val > 21 && aces > 0) {
-        val -= 10; aces--;
-      }
-      return val;
-    }
 
-    function deal() {
-      deck = createDeck();
-      playerHand = [deck.pop(), deck.pop()];
-      dealerHand = [deck.pop(), deck.pop()];
-      gameOver = false;
-      message = '';
-      hideDealerCard = true;
-      draw();
-    }
+        function addBet(amount) {
+            if (betPlaced) return;
+            if (balance - currentBet >= amount) {
+                currentBet += amount;
+                updateBetInfo();
+            }
+        }
 
-    function hit() {
-      if (gameOver) return;
-      playerHand.push(deck.pop());
-      if (handValue(playerHand) > 21) {
-        message = 'You bust! Dealer wins.';
-        gameOver = true;
-        hideDealerCard = false;
-      }
-      draw();
-    }
+        function clearBet() {
+            if (betPlaced) return;
+            currentBet = 0;
+            updateBetInfo();
+        }
 
-    function stand() {
-      if (gameOver) return;
-      hideDealerCard = false;
-      while (handValue(dealerHand) < 17) {
-        dealerHand.push(deck.pop());
-      }
-      let playerVal = handValue(playerHand);
-      let dealerVal = handValue(dealerHand);
-      if (dealerVal > 21 || playerVal > dealerVal) {
-        message = 'You win!';
-      } else if (dealerVal === playerVal) {
-        message = 'Push!';
-      } else {
-        message = 'Dealer wins!';
-      }
-      gameOver = true;
-      draw();
-    }
+        function placeBet() {
+            if (betPlaced || currentBet === 0) return;
+            if (currentBet > balance) {
+                alert("Not enough balance!");
+                return;
+            }
+            balance -= currentBet;
+            updateBalance();
+            betPlaced = true;
+            document.getElementById('hitBtn').disabled = false;
+            document.getElementById('standBtn').disabled = false;
+            document.getElementById('splitBtn').disabled = false;
+            document.getElementById('doubleBtn').disabled = false;
+            startGame();
+        }
 
-    function restart() {
-      deal();
-    }
+        function createDeck() {
+            let d = [];
+            for (let i = 0; i < 4; i++) { // 4 decks
+                for (let suit of suits) {
+                    for (let val of values) {
+                        d.push({suit: suit, name: val.name, value: val.value});
+                    }
+                }
+            }
+            for (let i = d.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [d[i], d[j]] = [d[j], d[i]];
+            }
+            return d;
+        }
 
-    function drawCard(card, x, y, faceDown = false) {
-      ctx.save();
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 2;
-      ctx.fillStyle = faceDown ? '#444' : '#fff';
-      ctx.fillRect(x, y, 50, 70);
-      ctx.strokeRect(x, y, 50, 70);
-      if (!faceDown) {
-        ctx.fillStyle = (card.suit === '♥' || card.suit === '♦') ? 'red' : 'black';
-        ctx.font = '20px Arial';
-        ctx.fillText(card.value, x + 5, y + 25);
-        ctx.fillText(card.suit, x + 30, y + 60);
-      } else {
-        ctx.fillStyle = '#333';
-        ctx.font = '30px Arial';
-        ctx.fillText('?', x + 18, y + 48);
-      }
-      ctx.restore();
-    }
+        function startGame() {
+            // If reshuffle is pending, create a new deck
+            if (reshufflePending || !deck || deck.length < 52) {
+                deck = createDeck();
+                reshufflePending = false;
+            }
+            playerHand = [deck.pop(), deck.pop()];
+            dealerHand = [deck.pop(), deck.pop()];
+            playerHands = [playerHand];
+            currentHandIndex = 0;
+            splitActive = false;
+            gameOver = false;
+            message = '';
+            revealDealer = false;
+            updateSplitButton();
+            updateDoubleButton();
+            draw();
+        }
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.font = '20px Arial';
-      ctx.fillStyle = '#fff';
-      ctx.fillText('Dealer', 50, 30);
-      for (let i = 0; i < dealerHand.length; i++) {
-        drawCard(dealerHand[i], 50 + i*60, 40, hideDealerCard && i === 1);
-      }
-      ctx.fillText('Player', 50, 160);
-      for (let i = 0; i < playerHand.length; i++) {
-        drawCard(playerHand[i], 50 + i*60, 170);
-      }
-      ctx.fillStyle = '#fff';
-      ctx.font = '18px Arial';
-      ctx.fillText(`Your hand: ${handValue(playerHand)}`, 50, 260);
-      if (!hideDealerCard) {
-        ctx.fillText(`Dealer hand: ${handValue(dealerHand)}`, 50, 100);
-      }
-      if (message) {
-        ctx.font = '24px Arial';
-        ctx.fillStyle = 'yellow';
-        ctx.fillText(message, 300, 350);
-      }
-    }
+        function updateSplitButton() {
+            const btn = document.getElementById('splitBtn');
+            if (
+                betPlaced &&
+                playerHands.length === 1 &&
+                playerHands[0].length === 2 &&
+                getCardValue(playerHands[0][0]) === getCardValue(playerHands[0][1]) &&
+                balance >= currentBet
+            ) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
 
-    deal();
-  </script>
+        function updateDoubleButton() {
+            const btn = document.getElementById('doubleBtn');
+            // Only allow double down on first move of a hand (2 cards), enough balance, and not after split
+            let hand = splitActive ? playerHands[currentHandIndex] : playerHand;
+            if (
+                betPlaced &&
+                hand.length === 2 &&
+                balance >= currentBet &&
+                !gameOver
+            ) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+
+        // Helper function to get the value for splitting
+        function getCardValue(card) {
+            // 10, J, Q, K all return 10, others return their value
+            if (card.name === '10' || card.name === 'J' || card.name === 'Q' || card.name === 'K') {
+                return 10;
+            }
+            if (card.name === 'A') {
+                return 11;
+            }
+            return parseInt(card.name);
+        }
+
+        function split() {
+            if (
+                !betPlaced ||
+                playerHands.length !== 1 ||
+                playerHands[0].length !== 2 ||
+                getCardValue(playerHands[0][0]) !== getCardValue(playerHands[0][1]) ||
+                balance < currentBet
+            ) {
+                return;
+            }
+            // Deduct additional bet for split
+            balance -= currentBet;
+            updateBalance();
+
+            // Split cards into two hands
+            const card1 = playerHands[0][0];
+            const card2 = playerHands[0][1];
+            playerHands = [
+                [card1, deck.pop()],
+                [card2, deck.pop()]
+            ];
+            currentHandIndex = 0;
+            splitActive = true;
+            updateSplitButton();
+            updateDoubleButton();
+            draw();
+        }
+
+        function handValue(hand) {
+            let val = hand.reduce((sum, card) => sum + card.value, 0);
+            let aces = hand.filter(card => card.name === 'A').length;
+            while (val > 21 && aces > 0) {
+                val -= 10;
+                aces--;
+            }
+            return val;
+        }
+
+        function drawCard(card, x, y) {
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(x, y, 60, 90);
+            ctx.strokeStyle = "#000";
+            ctx.strokeRect(x, y, 60, 90);
+            ctx.fillStyle = (card.suit === '♥' || card.suit === '♦') ? "#d00" : "#000";
+            ctx.font = "20px Arial";
+            ctx.fillText(card.name + card.suit, x + 8, y + 30);
+        }
+
+        function drawHand(hand, x, y, hideFirst = false) {
+            for (let i = 0; i < hand.length; i++) {
+                // Dealer's face-up card should be on the left (first card is face up, second is hidden if hideFirst)
+                if (i === 1 && hideFirst) {
+                    // Draw back of card for the dealer's second card
+                    ctx.fillStyle = "#3333cc";
+                    ctx.fillRect(x + i * 70, y, 60, 90);
+                    ctx.strokeStyle = "#000";
+                    ctx.strokeRect(x + i * 70, y, 60, 90);
+                } else {
+                    drawCard(hand[i], x + i * 70, y);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Dealer
+            ctx.font = "18px Arial";
+            ctx.fillStyle = "#fff";
+            ctx.fillText("Dealer", 50, 40);
+            drawHand(dealerHand, 50, 50, !revealDealer);
+
+            // Player(s)
+            ctx.fillText("Player", 50, 200);
+
+            if (splitActive) {
+                for (let i = 0; i < playerHands.length; i++) {
+                    let y = 210 + i * 110;
+                    drawHand(playerHands[i], 50, y);
+                    ctx.font = "16px Arial";
+                    ctx.fillStyle = i === currentHandIndex ? "#ff0" : "#fff";
+                    ctx.fillText(
+                        `Hand ${i + 1}: ${handValue(playerHands[i])}${i === currentHandIndex ? " (playing)" : ""}`,
+                        300,
+                        y
+                    );
+                    // Show bet amount next to each hand
+                    ctx.font = "16px Arial";
+                    ctx.fillStyle = "#ffeb3b";
+                    ctx.fillText(`Bet: $${currentBet}`, 500, y + 30);
+                }
+            } else {
+                drawHand(playerHand, 50, 210);
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "#fff";
+                ctx.fillText("Player: " + handValue(playerHand), 300, 200);
+                // Show bet amount next to the hand
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "#ffeb3b";
+                ctx.fillText(`Bet: $${currentBet}`, 500, 240);
+            }
+
+            // Scores
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#fff";
+            if (revealDealer) {
+                ctx.fillText("Dealer: " + handValue(dealerHand), 300, 40);
+            } else {
+                ctx.fillText("Dealer: ?", 300, 40);
+            }
+
+            // Message
+            ctx.font = "22px Arial";
+            ctx.fillStyle = "#ff0";
+            ctx.fillText(message, 50, 450);
+
+            // Show balance on canvas
+            ctx.font = "18px Arial";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(`Balance: $${balance}`, 500, 480);
+
+            updateSplitButton();
+            updateDoubleButton();
+        }
+
+        function hit() {
+            if (gameOver || !betPlaced) return;
+            let hand = splitActive ? playerHands[currentHandIndex] : playerHand;
+            hand.push(deck.pop());
+            if (handValue(hand) > 21) {
+                if (splitActive) {
+                    nextSplitHand();
+                } else {
+                    message = "You busted! Dealer wins.";
+                    gameOver = true;
+                    revealDealer = true;
+                    document.getElementById('hitBtn').disabled = true;
+                    document.getElementById('standBtn').disabled = true;
+                    document.getElementById('splitBtn').disabled = true;
+                    document.getElementById('doubleBtn').disabled = true;
+                    betPlaced = false;
+                }
+            }
+            updateDoubleButton();
+            draw();
+        }
+
+        function stand() {
+            if (gameOver || !betPlaced) return;
+            if (splitActive) {
+                nextSplitHand();
+                return;
+            }
+            finishDealerAndSettle([playerHand]);
+        }
+
+        function nextSplitHand() {
+            currentHandIndex++;
+            if (currentHandIndex < playerHands.length) {
+                updateDoubleButton();
+                draw();
+            } else {
+                finishDealerAndSettle(playerHands);
+            }
+        }
+
+        function finishDealerAndSettle(hands) {
+            revealDealer = true;
+
+            function isBlackjack(hand) {
+                return hand.length === 2 &&
+                    ((hand[0].name === 'A' && getCardValue(hand[1]) === 10) ||
+                     (hand[1].name === 'A' && getCardValue(hand[0]) === 10));
+            }
+
+            let dealerBJ = isBlackjack(dealerHand);
+            let playerBJ = isBlackjack(hands[0]);
+
+            // If player has blackjack and dealer does not, player wins immediately
+            if (playerBJ && !dealerBJ) {
+                message = `Blackjack! +$${Math.floor(currentBet * 1.5)}`;
+                draw();
+                setTimeout(() => finalizeRound(hands, false, true), 500);
+                return;
+            }
+
+            // If dealer has blackjack
+            if (dealerBJ) {
+                if (playerBJ) {
+                    message = "Push! Both you and the dealer have blackjack.";
+                } else {
+                    message = "Dealer has blackjack!";
+                }
+                draw();
+                setTimeout(() => finalizeRound(hands, true, false), 500);
+                return;
+            }
+
+            // Dealer plays only if no immediate blackjack
+            while (handValue(dealerHand) < 17) {
+                dealerHand.push(deck.pop());
+            }
+
+            // At the end, before draw();
+            if (deck.length <= 50 && !reshufflePending) {
+                reshufflePending = true;
+                alert("Deck is low! A new 4-deck shoe will be used after this hand.");
+            }
+            draw();
+            setTimeout(() => finalizeRound(hands, false, false), 500);
+        }
+
+        function finalizeRound(hands, dealerHadBlackjack, playerHadBlackjack) {
+            let winCount = 0, pushCount = 0, loseCount = 0, blackjackCount = 0, blackjackPayout = 0;
+            function isBlackjack(hand) {
+                return hand.length === 2 &&
+                    ((hand[0].name === 'A' && getCardValue(hand[1]) === 10) ||
+                     (hand[1].name === 'A' && getCardValue(hand[0]) === 10));
+            }
+            let dealerScore = handValue(dealerHand);
+
+            for (let hand of hands) {
+                let playerScore = handValue(hand);
+                let playerBJ = isBlackjack(hand);
+
+                if (dealerHadBlackjack) {
+                    let playerHadBJ = isBlackjack(hand);
+                    if (playerHadBJ) {
+                        pushCount++;
+                    } else {
+                        loseCount++;
+                    }
+                } else if (playerHadBlackjack && playerBJ) {
+                    blackjackCount++;
+                    winCount++;
+                    blackjackPayout += Math.floor(currentBet * 2.5); // 3:2 payout
+                } else if (playerBJ) {
+                    blackjackCount++;
+                    winCount++;
+                    blackjackPayout += Math.floor(currentBet * 2.5); // 3:2 payout
+                } else if (playerScore > 21) {
+                    loseCount++;
+                } else if (dealerScore > 21 || playerScore > dealerScore) {
+                    winCount++;
+                } else if (playerScore < dealerScore) {
+                    loseCount++;
+                } else {
+                    pushCount++;
+                }
+            }
+
+            // Set message and payout
+            if (hands.length > 1) {
+                message = `Split results: ${winCount} win, ${pushCount} push, ${loseCount} lose.`;
+                if (blackjackCount > 0) {
+                    message += ` (${blackjackCount} blackjack${blackjackCount > 1 ? "s" : ""} at 3:2)`;
+                }
+            } else if (dealerHadBlackjack) {
+                let playerBJ = isBlackjack(hands[0]);
+                if (playerBJ) {
+                    message = "Push! Both you and the dealer have blackjack.";
+                } else {
+                    message = "Dealer has blackjack!";
+                }
+            } else if (playerHadBlackjack) {
+                message = `Blackjack! +$${Math.floor(currentBet * 1.5)}`;
+            } else if (winCount) {
+                message = `You win! +$${currentBet}`;
+            } else if (pushCount) {
+                message = "Push!";
+            } else {
+                message = "Dealer wins!";
+            }
+
+            // Calculate payout
+            let payout = 0;
+            if (hands.length > 1) {
+                payout = winCount * currentBet * 2 + pushCount * currentBet + blackjackPayout - blackjackCount * currentBet * 2;
+            } else if (dealerHadBlackjack) {
+                payout = pushCount * currentBet; // Only push returns bet
+            } else if (playerHadBlackjack) {
+                payout = Math.floor(currentBet * 2.5);
+            } else {
+                payout = winCount * currentBet * 2 + pushCount * currentBet;
+            }
+            balance += payout;
+
+            gameOver = true;
+            document.getElementById('hitBtn').disabled = true;
+            document.getElementById('standBtn').disabled = true;
+            document.getElementById('splitBtn').disabled = true;
+            document.getElementById('doubleBtn').disabled = true;
+            betPlaced = false;
+            updateBalance();
+
+            // Only clear currentBet if there was a win or loss (not a push)
+            if ((hands.length > 1 && (winCount > 0 || loseCount > 0)) ||
+                (hands.length === 1 && (winCount || loseCount || dealerHadBlackjack || playerHadBlackjack))) {
+                currentBet = 0;
+            }
+            updateBetInfo();
+
+            draw();
+        }
+
+        function doubleDown() {
+            if (!betPlaced || gameOver) return;
+            let hand = splitActive ? playerHands[currentHandIndex] : playerHand;
+
+            // Only allow double down on first move of a hand (2 cards) and enough balance
+            if (hand.length === 2 && balance >= currentBet) {
+                balance -= currentBet;
+                updateBalance();
+                currentBet *= 2;
+                updateBetInfo();
+
+                hand.push(deck.pop()); // Draw one and only one card
+
+                // After double down, hand is over immediately
+                if (splitActive) {
+                    nextSplitHand();
+                } else {
+                    finishDealerAndSettle([playerHand]);
+                }
+            }
+            // Disable double down button after use
+            updateDoubleButton();
+            draw();
+        }
+
+        // Initial UI setup
+        updateBalance();
+        updateBetInfo();
+        document.getElementById('hitBtn').disabled = true;
+        document.getElementById('standBtn').disabled = true;
+
+        document.addEventListener('keydown', function(e) {
+            if (betPlaced) return;
+            switch (e.key) {
+                case '1':
+                    addBet(5);
+                    break;
+                case '2':
+                    addBet(10);
+                    break;
+                case '3':
+                    addBet(25);
+                    break;
+                case '4':
+                    addBet(50);
+                    break;
+                case '5':
+                    addBet(100);
+                    break;
+                case '6':
+                    addBet(250);
+                    break;
+            }
+        });
+    </script>
 </body>
 </html>
+
+
