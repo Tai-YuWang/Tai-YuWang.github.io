@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Poker (Texas Hold'em) - Simple Bot Demo</title>
+    <style>
+        body { background: #222; color: #fff; font-family: Arial, sans-serif; }
+        #gameCanvas { background: #35654d; display: block; margin: 20px auto; border-radius: 10px; }
+        #controls { text-align: center; margin-top: 10px; }
+        button { font-size: 16px; margin: 0 5px; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center;">Texas Hold'em Poker (Bots Demo)</h1>
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
+    <div id="controls">
+        <button onclick="playerAction('fold')">Fold</button>
+        <button onclick="playerAction('check')">Check</button>
+        <button onclick="playerAction('call')">Call</button>
+        <button onclick="playerAction('bet')">Bet</button>
+        <input id="betAmount" type="number" value="20" min="1" style="width:60px;">
+        <button onclick="playerAction('allin')">All In</button>
+    </div>
+    <script>
+    // --- Poker Game Core ---
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Card and deck setup
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = [
+        {name: '2', value: 2},
+        {name: '3', value: 3},
+        {name: '4', value: 4},
+        {name: '5', value: 5},
+        {name: '6', value: 6},
+        {name: '7', value: 7},
+        {name: '8', value: 8},
+        {name: '9', value: 9},
+        {name: '10', value: 10},
+        {name: 'J', value: 11},
+        {name: 'Q', value: 12},
+        {name: 'K', value: 13},
+        {name: 'A', value: 14}
+    ];
+
+    const handStrengthRank = {
+        "AA": 1, "KK": 2, "QQ": 3, "JJ": 4, "AKs": 5, "AQs": 6, "AJs": 7, "KQs": 8, "AKo": 9, "TT": 10,
+        "AQo": 11, "99": 12, "KJs": 13, "QJs": 14, "JTs": 15, "AJo": 16, "KQo": 17, "88": 18, "T9s": 19, "QTs": 20,
+        "KJo": 21, "77": 22, "JTo": 23, "76s": 24, "98s": 25, "65s": 26, "87s": 27, "QJo": 28, "T8s": 29, "A9s": 30,
+        "66": 31, "KTs": 32, "55": 33, "44": 34, "A8s": 35, "T7s": 36, "33": 37, "22": 38, "A5s": 39, "A7s": 40,
+        "A6s": 41, "K9s": 42, "Q9s": 43, "J9s": 44, "T6s": 45, "97s": 46, "86s": 47, "75s": 48, "64s": 49, "53s": 50,
+        "K8s": 51, "Q8s": 52, "J8s": 53, "A4s": 54, "A3s": 55, "A2s": 56, "K7s": 57, "Q7s": 58, "J7s": 59, "T5s": 60
+        // All other hands are considered weakest
+    };
+
+    // Helper to get hand code for ranking
+    function getHandCode(card1, card2) {
+        let v1 = card1.value, v2 = card2.value;
+        let n1 = card1.name, n2 = card2.name;
+        let suited = card1.suit === card2.suit;
+        // Sort by value descending
+        if (v1 < v2) { [v1, v2] = [v2, v1]; [n1, n2] = [n2, n1]; }
+        if (v1 === v2) return n1 + n2; // e.g. "AA", "TT"
+        if (suited) return n1 + n2 + "s";
+        return n1 + n2 + "o";
+    }
+
+    function createDeck() {
+        let deck = [];
+        for (let suit of suits) {
+            for (let val of values) {
+                deck.push({suit: suit, name: val.name, value: val.value});
+            }
+        }
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+        return deck;
+    }
+
+    // Game state
+    const NUM_BOTS = 3;
+    let players = [];
+    let communityCards = [];
+    let deck = [];
+    let pot = 0;
+    let currentBet = 0;
+    let playerTurn = 0; // 0 = human, 1..NUM_BOTS = bots
+    let roundStage = 0; // 0 = preflop, 1 = flop, 2 = turn, 3 = river, 4 = showdown
+    let playerBets = [];
+    let folded = [];
+    let playerChips = [1000, 1000, 1000, 1000];
+    let message = "";
+    let gameOverScreen = false;
+
+    function resetGame() {
+        deck = createDeck();
+        players = [];
+        communityCards = [];
+        pot = 0;
+        currentBet = 0;
+        playerTurn = 0;
+        roundStage = 0;
+        playerBets = [0, 0, 0, 0];
+        folded = [false, false, false, false];
+        message = "";
+        gameOverScreen = false;
+
+        // Deal 2 cards to each player
+        for (let i = 0; i < 4; i++) {
+            players[i] = [deck.pop(), deck.pop()];
+        }
+        // Blinds
+        playerBets[1] = 25; playerChips[1] -= 25;   // Small blind
+        playerBets[2] = 50; playerChips[2] -= 50;   // Big blind
+        currentBet = 50;
+        pot = 75;
+        playerTurn = 0;
+        setMinBetInput();
+        draw();
+        if (playerTurn !== 0) botMove();
+    }
+
+    function setMinBetInput() {
+        let toCall = currentBet - playerBets[0];
+        let minBet = Math.max(10, toCall + 10);
+        const betInput = document.getElementById('betAmount');
+        if (betInput) {
+            betInput.value = minBet;
+            betInput.min = minBet;
+            betInput.max = playerChips[0];
+        }
+    }
+
+    function drawCard(card, x, y, faceUp = true) {
+        ctx.save();
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = faceUp ? "#fff" : "#888";
+        ctx.fillRect(x, y, 50, 70);
+        ctx.strokeRect(x, y, 50, 70);
+        if (faceUp) {
+            ctx.fillStyle = (card.suit === '♥' || card.suit === '♦') ? "#d00" : "#000";
+            ctx.font = "18px Arial";
+            ctx.fillText(card.name + card.suit, x + 7, y + 25);
+        } else {
+            ctx.fillStyle = "#444";
+            ctx.fillRect(x + 5, y + 5, 40, 60);
+        }
+        ctx.restore();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw pot
+        ctx.font = "22px Arial";
+        ctx.fillStyle = "#ff0";
+        ctx.fillText("Pot: $" + pot, 400, 40);
+
+        // Draw community cards
+        ctx.font = "18px Arial";
+        ctx.fillStyle = "#fff";
+        ctx.fillText("Community Cards:", 340, 90);
+        for (let i = 0; i < communityCards.length; i++) {
+            drawCard(communityCards[i], 340 + i * 60, 110, true);
+        }
+
+        // Draw players
+        for (let i = 0; i < 4; i++) {
+            // Adjust y/x so no bot covers the heading or community cards
+            let y, x;
+            if (i === 0) { // You
+                y = 340; x = 380;
+            } else if (i === 1) { // Bot 1 (left)
+                y = 170; x = 60; // Raised from 220 to 170
+            } else if (i === 2) { // Bot 2 (bottom left, under Bot 1)
+                y = 340; x = 60;
+            } else if (i === 3) { // Bot 3 (right)
+                y = 220; x = 700;
+            }
+            let label = i === 0 ? "You" : "Bot " + i;
+            ctx.font = "18px Arial";
+            ctx.fillStyle = folded[i] ? "#888" : "#fff";
+            ctx.fillText(label + ` ($${playerChips[i]})`, x, y - 10);
+
+            // Show cards
+            if (i === 0 || roundStage === 4 || folded[i]) {
+                drawCard(players[i][0], x, y, !folded[i]);
+                drawCard(players[i][1], x + 60, y, !folded[i]);
+            } else {
+                drawCard({}, x, y, false);
+                drawCard({}, x + 60, y, false);
+            }
+
+            // Show bet
+            if (playerBets[i] > 0) {
+                ctx.font = "16px Arial";
+                ctx.fillStyle = "#ff0";
+                ctx.fillText("Bet: $" + playerBets[i], x, y + 85);
+            }
+        }
+
+        // Message
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(message, 350, 480);
+
+        // Turn indicator
+        if (!isGameOver() && playerTurn === 0 && !gameOverScreen) {
+            ctx.font = "18px Arial";
+            ctx.fillStyle = "#0f0";
+            ctx.fillText("Your turn!", 400, 460);
+        }
+
+        // Game over overlay
+        if (gameOverScreen) {
+            ctx.save();
+            ctx.globalAlpha = 0.85;
+            ctx.fillStyle = "#000";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1;
+            ctx.font = "bold 48px Arial";
+            ctx.fillStyle = "#f44";
+            ctx.textAlign = "center";
+            ctx.fillText("You Lose", canvas.width / 2, canvas.height / 2);
+            ctx.textAlign = "start";
+            ctx.restore();
+        }
+    }
+
+    function isGameOver() {
+        // Only one player left or all-in showdown
+        let active = folded.filter(f => !f).length;
+        return active === 1 || roundStage === 4;
+    }
+
+    function playerAction(action) {
+        if (playerTurn !== 0 || isGameOver() || gameOverScreen) return;
+        let betInput = parseInt(document.getElementById('betAmount').value) || 0;
+        let toCall = currentBet - playerBets[0];
+
+        if (action === 'fold') {
+            folded[0] = true;
+            message = "You folded.";
+            nextTurn();
+        } else if (action === 'check') {
+            if (playerBets[0] === currentBet) {
+                message = "You checked.";
+                nextTurn();
+            } else {
+                message = "You can't check, must call or fold.";
+            }
+        } else if (action === 'call') {
+            if (playerChips[0] >= toCall) {
+                playerChips[0] -= toCall;
+                playerBets[0] += toCall;
+                pot += toCall;
+                message = "You called.";
+                nextTurn();
+            } else {
+                message = "Not enough chips to call.";
+            }
+        } else if (action === 'bet') {
+            // Enforce minimum bet: at least 10 and at least the call amount + 10
+            let minBet = Math.max(10, toCall + 10);
+            if (
+                betInput >= minBet &&
+                betInput + playerBets[0] > currentBet &&
+                betInput <= playerChips[0]
+            ) {
+                let raise = betInput + playerBets[0] - currentBet;
+                playerChips[0] -= betInput;
+                playerBets[0] += betInput;
+                pot += betInput;
+                currentBet = playerBets[0];
+                message = "You bet $" + betInput;
+                nextTurn();
+            } else {
+                message = `Invalid bet. Minimum bet is $${minBet}.`;
+            }
+        } else if (action === 'allin') {
+            let allInAmount = playerChips[0];
+            let minAllIn = Math.max(10, toCall + 10);
+            if (allInAmount >= minAllIn) {
+                playerBets[0] += allInAmount;
+                pot += allInAmount;
+                playerChips[0] = 0;
+                if (playerBets[0] > currentBet) {
+                    currentBet = playerBets[0];
+                }
+                message = "You went all in!";
+                nextTurn();
+            } else {
+                message = `All in must be at least $${minAllIn}.`;
+            }
+        }
+        // Check for bust after any action
+        if (playerChips[0] === 0 && pot === 0) {
+            showGameOver();
+            return;
+        }
+        draw();
+    }
+
+    function nextTurn() {
+        // Check for immediate win before proceeding
+        if (checkForImmediateWin()) return;
+
+        // Find next active player
+        let start = playerTurn;
+        do {
+            playerTurn = (playerTurn + 1) % 4;
+        } while (folded[playerTurn] && !isGameOver());
+
+        if (playerTurn === 0 && !isGameOver() && !gameOverScreen) {
+            setMinBetInput();
+        }
+
+        if (playerTurn !== 0 && !isGameOver()) {
+            setTimeout(botMove, 700);
+        } else if (isBettingRoundOver()) {
+            setTimeout(nextStage, 1000);
+        }
+        draw();
+    }
+
+    function isBettingRoundOver() {
+        // Betting round is over if all non-folded players have matched the current bet
+        for (let i = 0; i < 4; i++) {
+            if (!folded[i] && playerBets[i] !== currentBet) return false;
+        }
+        return true;
+    }
+
+    function nextStage() {
+        // Move to next stage: flop, turn, river, showdown
+        for (let i = 0; i < 4; i++) playerBets[i] = 0;
+        currentBet = 0;
+        if (roundStage === 0) {
+            // Flop
+            communityCards = [deck.pop(), deck.pop(), deck.pop()];
+            roundStage = 1;
+        } else if (roundStage === 1) {
+            // Turn
+            communityCards.push(deck.pop());
+            roundStage = 2;
+        } else if (roundStage === 2) {
+            // River
+            communityCards.push(deck.pop());
+            roundStage = 3;
+        } else if (roundStage === 3) {
+            // Showdown
+            roundStage = 4;
+            message = "Showdown!";
+            setTimeout(() => {
+                let winner = determineWinner();
+                message = winner === 0 ? "You win the pot!" : `Bot ${winner} wins the pot!`;
+                playerChips[winner] += pot;
+                pot = 0;
+                draw();
+                setTimeout(resetGame, 3000);
+            }, 1500);
+            draw();
+            return;
+        }
+        playerTurn = 0;
+        draw();
+    }
+
+    function botMove() {
+        if (folded[playerTurn] || isGameOver()) return;
+        let toCall = currentBet - playerBets[playerTurn];
+        let action = "fold";
+        let handRank = 100; // Default: weak hand
+
+        // Preflop: use hand strength
+        if (roundStage === 0) {
+            let code = getHandCode(players[playerTurn][0], players[playerTurn][1]);
+            handRank = handStrengthRank[code] || 999; // 999 = worst
+        }
+
+        // Bluff chance (higher on weak hands, lower on strong hands)
+        let bluff = Math.random() < (
+            handRank > 30 ? 0.18 : // 18% bluff with weak hands
+            handRank > 10 ? 0.08 : // 8% bluff with medium hands
+            0.02 // 2% bluff with strong hands
+        );
+
+        // --- Preflop Betting Sizes ---
+        // Premium: 3-4x BB ($150-$200), Strong: 2.5-3x BB ($125-$150), Playable: 2-2.5x BB ($100-$125), Speculative: call or $50-$75
+        let raiseAmount = 0;
+        if (handRank <= 10) { // Premium
+            raiseAmount = 150 + Math.floor(Math.random() * 51); // $150-$200
+        } else if (handRank <= 20) { // Strong
+            raiseAmount = 125 + Math.floor(Math.random() * 26); // $125-$150
+        } else if (handRank <= 30) { // Playable
+            raiseAmount = 100 + Math.floor(Math.random() * 26); // $100-$125
+        } else { // Speculative/Bluff
+            raiseAmount = 50 + Math.floor(Math.random() * 26); // $50-$75
+        }
+
+        if (roundStage === 0) {
+            if (bluff && toCall === 0 && playerChips[playerTurn] > raiseAmount) {
+                // Bluff raise
+                playerChips[playerTurn] -= raiseAmount;
+                playerBets[playerTurn] += raiseAmount;
+                pot += raiseAmount;
+                currentBet = playerBets[playerTurn];
+                message = `Bot ${playerTurn} bluffs and raises $${raiseAmount}`;
+            } else if (handRank <= 10) { // Premium
+                if (toCall === 0 && playerChips[playerTurn] > raiseAmount) {
+                    playerChips[playerTurn] -= raiseAmount;
+                    playerBets[playerTurn] += raiseAmount;
+                    pot += raiseAmount;
+                    currentBet = playerBets[playerTurn];
+                    message = `Bot ${playerTurn} raises $${raiseAmount}`;
+                } else if (playerChips[playerTurn] >= toCall) {
+                    playerChips[playerTurn] -= toCall;
+                    playerBets[playerTurn] += toCall;
+                    pot += toCall;
+                    message = `Bot ${playerTurn} calls.`;
+                } else {
+                    folded[playerTurn] = true;
+                    message = `Bot ${playerTurn} folds.`;
+                }
+            } else if (handRank <= 20) { // Strong
+                if (toCall === 0 && playerChips[playerTurn] > raiseAmount) {
+                    playerChips[playerTurn] -= raiseAmount;
+                    playerBets[playerTurn] += raiseAmount;
+                    pot += raiseAmount;
+                    currentBet = playerBets[playerTurn];
+                    message = `Bot ${playerTurn} raises $${raiseAmount}`;
+                } else if (playerChips[playerTurn] >= toCall) {
+                    playerChips[playerTurn] -= toCall;
+                    playerBets[playerTurn] += toCall;
+                    pot += toCall;
+                    message = `Bot ${playerTurn} calls.`;
+                } else {
+                    folded[playerTurn] = true;
+                    message = `Bot ${playerTurn} folds.`;
+                }
+            } else if (handRank <= 30) { // Playable
+                if (toCall === 0 && Math.random() < 0.5 && playerChips[playerTurn] > raiseAmount) {
+                    playerChips[playerTurn] -= raiseAmount;
+                    playerBets[playerTurn] += raiseAmount;
+                    pot += raiseAmount;
+                    currentBet = playerBets[playerTurn];
+                    message = `Bot ${playerTurn} raises $${raiseAmount}`;
+                } else if (playerChips[playerTurn] >= toCall) {
+                    playerChips[playerTurn] -= toCall;
+                    playerBets[playerTurn] += toCall;
+                    pot += toCall;
+                    message = `Bot ${playerTurn} calls.`;
+                } else {
+                    folded[playerTurn] = true;
+                    message = `Bot ${playerTurn} folds.`;
+                }
+            } else { // Weak/Speculative
+                if (bluff && toCall === 0 && playerChips[playerTurn] > raiseAmount) {
+                    playerChips[playerTurn] -= raiseAmount;
+                    playerBets[playerTurn] += raiseAmount;
+                    pot += raiseAmount;
+                    currentBet = playerBets[playerTurn];
+                    message = `Bot ${playerTurn} bluffs and raises $${raiseAmount}`;
+                } else if (toCall === 0 && Math.random() < 0.2) {
+                    message = `Bot ${playerTurn} checks.`;
+                } else if (playerChips[playerTurn] >= toCall && Math.random() < 0.25) {
+                    playerChips[playerTurn] -= toCall;
+                    playerBets[playerTurn] += toCall;
+                    pot += toCall;
+                    message = `Bot ${playerTurn} calls.`;
+                } else {
+                    folded[playerTurn] = true;
+                    message = `Bot ${playerTurn} folds.`;
+                }
+            }
+        } else {
+            // Postflop: allow bluffing sometimes
+            let handStrength = Math.random();
+            let postflopBluff = Math.random() < 0.12; // 12% bluff postflop
+            let postflopBet = 50 + Math.floor(Math.random() * 51); // $50-$100
+            if (postflopBluff && toCall === 0 && playerChips[playerTurn] > postflopBet) {
+                playerChips[playerTurn] -= postflopBet;
+                playerBets[playerTurn] += postflopBet;
+                pot += postflopBet;
+                currentBet = playerBets[playerTurn];
+                message = `Bot ${playerTurn} bluffs and bets $${postflopBet}`;
+            } else if (toCall === 0) {
+                if (handStrength > 0.7 && playerChips[playerTurn] > postflopBet) {
+                    playerChips[playerTurn] -= postflopBet;
+                    playerBets[playerTurn] += postflopBet;
+                    pot += postflopBet;
+                    currentBet = playerBets[playerTurn];
+                    message = `Bot ${playerTurn} bets $${postflopBet}`;
+                } else {
+                    message = `Bot ${playerTurn} checks.`;
+                }
+            } else if (toCall > 0) {
+                if (handStrength > 0.3 && playerChips[playerTurn] >= toCall) {
+                    playerChips[playerTurn] -= toCall;
+                    playerBets[playerTurn] += toCall;
+                    pot += toCall;
+                    message = `Bot ${playerTurn} calls.`;
+                } else {
+                    folded[playerTurn] = true;
+                    message = `Bot ${playerTurn} folds.`;
+                }
+            }
+        }
+        nextTurn();
+    }
+
+    // Simple winner determination: highest card in hand + board
+    function determineWinner() {
+        let best = -1, bestVal = -1;
+        for (let i = 0; i < 4; i++) {
+            if (folded[i]) continue;
+            let allCards = communityCards.concat(players[i]);
+            let max = Math.max(...allCards.map(c => c.value));
+            if (max > bestVal) {
+                bestVal = max;
+                best = i;
+            }
+        }
+        return best;
+    }
+
+    function checkForImmediateWin() {
+        // If only one player is not folded, award the pot and reset
+        let activePlayers = folded.map(f => !f);
+        let winner = activePlayers.indexOf(true);
+        if (activePlayers.filter(Boolean).length === 1) {
+            message = winner === 0 ? "You win the pot!" : `Bot ${winner} wins the pot!`;
+            playerChips[winner] += pot;
+            pot = 0;
+            draw();
+            setTimeout(resetGame, 2500);
+            return true;
+        }
+        return false;
+    }
+
+    // Start the game
+    resetGame();
+    </script>
+</body>
+</html>
